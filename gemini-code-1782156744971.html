@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ms Lê Hằng English - Pronunciation & Stress Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-teal: #00B4A2;
+            --dark-teal: #006D63;
+            --emerald: #00A699;
+            --glass-white: rgba(255, 255, 255, 0.15);
+            --correct: #00D26A;
+            --wrong: #FF4757;
+            --accent-yellow: #FFF9C4;
+            --accent-orange: #FF8F00;
+            --ipa-bg: #F3E5F5;
+            --ipa-text: #7B1FA2;
+            --eng-blue: #0056b3;
+            --vn-red: #D84315;
+        }
+
+        * { box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-teal);
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M30 20 Q35 10 40 20 T50 20' fill='none' stroke='white' stroke-opacity='0.1'/%3E%3Ccircle cx='80' cy='80' r='5' fill='white' fill-opacity='0.1'/%3E%3C/svg%3E");
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* SVG lơ lửng decor */
+        .decor {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+
+        header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        /* Warning Box */
+        .warning-box {
+            width: 90%;
+            max-width: 800px;
+            background: #FFF9C4;
+            border: 3px solid #FBC02D;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .warning-box h3 {
+            margin: 0 0 10px 0;
+            color: #F57F17;
+            font-size: 1.3rem;
+        }
+
+        .warning-box p {
+            margin: 5px 0;
+            color: #5D4037;
+            font-weight: 700;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Question Card */
+        #quiz-app {
+            width: 95%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            padding-bottom: 100px;
+        }
+
+        .question-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .question-header {
+            background-color: var(--dark-teal);
+            border-radius: 20px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .question-num {
+            display: block;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #FFF176;
+            margin-bottom: 10px;
+        }
+
+        .word-list {
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 10px;
+        }
+
+        /* Answer Grid */
+        .answer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-answer {
+            background-color: #E0F2F1;
+            border: none;
+            border-radius: 18px;
+            padding: 18px 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #333;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 6px 0 #B2DFDB;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .btn-answer:hover:not(.locked) {
+            transform: scale(1.02);
+            background-color: white;
+        }
+
+        .btn-answer:active:not(.locked) {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #B2DFDB;
+        }
+
+        .btn-answer u { text-decoration-color: var(--wrong); text-decoration-thickness: 2px; }
+
+        .btn-answer.correct {
+            background-color: var(--correct) !important;
+            color: white !important;
+            box-shadow: 0 6px 0 #009624 !important;
+        }
+
+        .btn-answer.wrong {
+            background-color: var(--wrong) !important;
+            color: white !important;
+            box-shadow: 0 6px 0 #C2185B !important;
+        }
+
+        .btn-answer.locked { pointer-events: none; opacity: 0.8; }
+
+        /* Explanation Box */
+        .explanation {
+            background: white;
+            border-radius: 25px;
+            border-left: 10px solid var(--accent-orange);
+            margin-top: 25px;
+            display: none;
+            overflow: hidden;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .exp-banner {
+            background-color: var(--accent-yellow);
+            border: 2px dashed var(--accent-orange);
+            margin: 15px;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            color: #E65100;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .exp-content { padding: 0 25px 25px 25px; line-height: 1.7; }
+        .analysis-title { font-weight: 800; color: var(--dark-teal); margin-bottom: 10px; font-size: 1.1rem; }
+        .exp-item { margin-bottom: 8px; font-size: 1.05rem; }
+        .exp-eng { color: var(--eng-blue); font-weight: 700; }
+        .exp-ipa { background: #f0f0f0; color: var(--ipa-purple); padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.9rem; }
+        .exp-vi { color: var(--vn-red); font-weight: 600; }
+
+        .summary-btn {
+            background: var(--accent-yellow);
+            border: none;
+            border-radius: 50px;
+            padding: 18px 45px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--dark-teal);
+            cursor: pointer;
+            box-shadow: 0 6px 0 #D4E157;
+            margin-bottom: 50px;
+            transition: 0.2s;
+        }
+
+        .summary-btn:hover { transform: scale(1.05); background: white; }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 35px;
+            text-align: center;
+            max-width: 450px;
+            border: 5px solid var(--bg-teal);
+        }
+
+        .score-num { font-size: 4rem; font-weight: 800; color: var(--wrong); }
+
+        /* Icon Animation */
+        .floating { animation: move 6s infinite ease-in-out; }
+        @keyframes move { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        @media (max-width: 600px) {
+            .answer-grid { grid-template-columns: 1fr; }
+            .word-list { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <svg class="decor">
+        <circle cx="10%" cy="20%" r="20" fill="white" opacity="0.1" class="floating" style="animation-delay: 0s"/>
+        <rect x="85%" y="15%" width="30" height="30" fill="white" opacity="0.1" class="floating" style="animation-delay: 1s"/>
+        <path d="M50% 80% L55% 85% L45% 85% Z" fill="white" opacity="0.1" class="floating" style="animation-delay: 2s"/>
+    </svg>
+
+    <header>
+        <h4>Giáo viên tạo: Ms Lê Hằng English</h4>
+    </header>
+
+    <div class="warning-box">
+        <h3>⚠️ LỜI NHẮC CỰC KỲ QUAN TRỌNG ⚠️</h3>
+        <p>Chỉ có đọc kỹ giải thích ngay sau mỗi câu, sau đó ghi lại từ vựng/cấu trúc mới vào vở để học thì mới thực sự giỏi lên.</p>
+        <p>Làm cho xong mà không đọc giải thích hay đọc qua loa không ghi chép thì chỉ tốn thời gian vô ích!</p>
+        <p style="font-style: italic; color: var(--emerald); margin-top: 8px;">* Kéo tới đâu, làm tới đó! *</p>
+    </div>
+
+    <div id="quiz-app"></div>
+
+    <button class="summary-btn" onclick="showTotal()">🏆 TỔNG KẾT KẾT QUẢ</button>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 style="margin: 0; color: var(--bg-teal);">KẾT QUẢ CỦA CON</h2>
+            <div class="score-num" id="final-score">0/20</div>
+            <p id="praise-text" style="font-size: 1.2rem; font-weight: 700; color: #444;"></p>
+            <button class="summary-btn" style="margin-top: 20px; font-size: 1rem;" onclick="location.reload()">LÀM LẠI BÀI</button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(freq, type, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const questions = [
+            // Exercise 1: Pronunciation
+            { id: 1, type: "pron", words: ["carp", "article", "party", "tradition"], underline: "a", correct: 3, 
+              ipa: ["/kɑːrp/", "/ˈɑːrtɪkl/", "/ˈpɑːrti/", "/trəˈdɪʃn/"], vi: ["cá chép", "bài báo", "bữa tiệc", "truyền thống"],
+              why: "Phần gạch chân ở tradition phát âm là /ə/, trong khi các từ còn lại phát âm là /ɑː/." },
+            { id: 2, type: "pron", words: ["connect", "cook", "dance", "control"], underline: "c", correct: 2,
+              ipa: ["/kəˈnekt/", "/kʊk/", "/dæns/", "/kənˈtrəʊl/"], vi: ["kết nối", "nấu ăn", "nhảy múa", "kiểm soát"],
+              why: "Phần gạch chân ở dance phát âm là /s/, trong khi các từ còn lại phát âm là /k/." },
+            { id: 3, type: "pron", words: ["pass", "palm", "sharp", "man"], underline: "a", correct: 3,
+              ipa: ["/pɑːs/", "/pɑːm/", "/ʃɑːrp/", "/mæn/"], vi: ["vượt qua", "lòng bàn tay", "sắc nhọn", "người đàn ông"],
+              why: "Phần gạch chân ở man phát âm là /æ/, trong khi các từ còn lại phát âm là /ɑː/." },
+            { id: 4, type: "pron", words: ["custom", "correct", "clockwise", "opinion"], underline: "o", correct: 0,
+              ipa: ["/ˈkʌstəm/", "/kəˈrekt/", "/ˈklɒkwaɪz/", "/əˈpɪnjən/"], vi: ["phong tục", "chính xác", "theo chiều kim đồng hồ", "ý kiến"],
+              why: "Phần gạch chân ở custom phát âm là /ʌ/, trong khi các từ còn lại phát âm là /ə/." },
+            { id: 5, type: "pron", words: ["kidding", "generate", "sponge", "oblige"], underline: "g", correct: 0,
+              ipa: ["/ˈkɪdɪŋ/", "/ˈdʒenəreɪt/", "/spʌndʒ/", "/əˈblaɪdʒ/"], vi: ["đùa giỡn", "tạo ra", "miếng xốp", "bắt buộc"],
+              why: "Phần gạch chân ở kidding phát âm là /k/, trong khi các từ còn lại phát âm là /dʒ/." },
+            { id: 6, type: "pron", words: ["design", "preserve", "basic", "physical"], underline: "s", correct: 2,
+              ipa: ["/dɪˈzaɪn/", "/prɪˈzɜːrv/", "/ˈbeɪsɪk/", "/ˈfɪzɪkl/"], vi: ["thiết kế", "bảo tồn", "cơ bản", "thuộc thể chất"],
+              why: "Phần gạch chân ở basic phát âm là /s/, trong khi các từ còn lại phát âm là /z/." },
+            { id: 7, type: "pron", words: ["cousin", "interesting", "link", "fond"], underline: "n", correct: 2,
+              ipa: ["/ˈkʌzn/", "/ˈɪntrestɪŋ/", "/lɪŋk/", "/fɒnd/"], vi: ["anh chị em họ", "thú vị", "liên kết", "yêu thích"],
+              why: "Phần gạch chân ở link phát âm là /ŋ/, trong khi các từ còn lại phát âm là /n/." },
+            { id: 8, type: "pron", words: ["lantern", "important", "money", "thank"], underline: "n", correct: 3,
+              ipa: ["/ˈlæntərn/", "/ɪmˈpɔːrtnt/", "/ˈmʌni/", "/θæŋk/"], vi: ["đèn lồng", "quan trọng", "tiền", "cảm ơn"],
+              why: "Phần gạch chân ở thank phát âm là /ŋ/, trong khi các từ còn lại phát âm là /n/." },
+            { id: 9, type: "pron", words: ["many", "take", "place", "wake"], underline: "a", correct: 0,
+              ipa: ["/ˈmeni/", "/teɪk/", "/pleɪs/", "/weɪk/"], vi: ["nhiều", "lấy", "nơi chốn", "thức dậy"],
+              why: "Phần gạch chân ở many phát âm là /e/, trong khi các từ còn lại phát âm là /eɪ/." },
+            { id: 10, type: "pron", words: ["occupation", "occasion", "shake", "miraculous"], underline: "a", correct: 3,
+              ipa: ["/ˌɒkjuˈpeɪʃn/", "/əˈkeɪʒn/", "/ʃeɪk/", "/mɪˈrækjələs/"], vi: ["nghề nghiệp", "dịp", "lắc", "kì diệu"],
+              why: "Phần gạch chân ở miraculous phát âm là /æ/, trong khi các từ còn lại phát âm là /eɪ/." },
+
+            // Exercise 2: Stress
+            { id: 11, type: "stress", words: ["holiday", "decorate", "offering", "addition"], correct: 3,
+              ipa: ["/ˈhɒlədeɪ/", "/ˈdekəreɪt/", "/ˈɒfərɪŋ/", "/əˈdɪʃn/"], vi: ["ngày lễ (1)", "trang trí (1)", "lễ vật (1)", "phần thêm vào (2)"],
+              why: "addition có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 1." },
+            { id: 12, type: "stress", words: ["laughter", "prepare", "chopstick", "heaven"], correct: 1,
+              ipa: ["/ˈlɑːftər/", "/prɪˈpeər/", "/ˈtʃɒpstɪk/", "/ˈhevn/"], vi: ["tiếng cười (1)", "chuẩn bị (2)", "đũa (1)", "thiên đường (1)"],
+              why: "prepare có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 1." },
+            { id: 13, type: "stress", words: ["resident", "cutlery", "ancestor", "permission"], correct: 3,
+              ipa: ["/ˈrezɪdənt/", "/ˈkʌtləri/", "/ˈænsestər/", "/pəˈmɪʃn/"], vi: ["cư dân (1)", "bộ đồ ăn (1)", "tổ tiên (1)", "sự cho phép (2)"],
+              why: "permission có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 1." },
+            { id: 14, type: "stress", words: ["generation", "presentation", "necessity", "obligation"], correct: 2,
+              ipa: ["/ˌdʒenəˈreɪʃn/", "/ˌpreznˈteɪʃn/", "/nəˈsesəti/", "/ˌɒblɪˈɡeɪʃn/"], vi: ["thế hệ (3)", "bài thuyết trình (3)", "sự cần thiết (2)", "nghĩa vụ (3)"],
+              why: "necessity có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 3." },
+            { id: 15, type: "stress", words: ["festival", "contestant", "atmosphere", "family"], correct: 1,
+              ipa: ["/ˈfestɪvl/", "/kənˈtestənt/", "/ˈætməsfɪər/", "/ˈfæməli/"], vi: ["lễ hội (1)", "thí sinh (2)", "bầu không khí (1)", "gia đình (1)"],
+              why: "contestant có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 1." },
+            { id: 16, type: "stress", words: ["village", "bamboo", "away", "obey"], correct: 0,
+              ipa: ["/ˈvɪlɪdʒ/", "/ˌbæmˈbuː/", "/əˈweɪ/", "/əˈbeɪ/"], vi: ["ngôi làng (1)", "cây tre (2)", "xa xôi (2)", "vâng lời (2)"],
+              why: "village có trọng âm rơi vào âm tiết thứ 1, các từ còn lại rơi vào âm tiết thứ 2." },
+            { id: 17, type: "stress", words: ["custom", "worship", "maintain", "midnight"], correct: 2,
+              ipa: ["/ˈkʌstəm/", "/ˈwɜːrʃɪp/", "/meɪnˈteɪn/", "/ˈmɪdnaɪt/"], vi: ["phong tục (1)", "thờ cúng (1)", "duy trì (2)", "nửa đêm (1)"],
+              why: "maintain có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 1." },
+            { id: 18, type: "stress", words: ["respect", "mention", "expert", "worship"], correct: 0,
+              ipa: ["/rɪˈspekt/", "/ˈmenʃn/", "/ˈekspɜːrt/", "/ˈwɜːrʃɪp/"], vi: ["tôn trọng (2)", "đề cập (1)", "chuyên gia (1)", "thờ cúng (1)"],
+              why: "respect có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 1." },
+            { id: 19, type: "stress", words: ["pagoda", "complement", "society", "tradition"], correct: 1,
+              ipa: ["/pəˈɡəʊdə/", "/ˈkɒmplɪment/", "/səˈsaɪəti/", "/trəˈdɪʃn/"], vi: ["chùa (2)", "phần bổ sung (1)", "xã hội (2)", "truyền thống (2)"],
+              why: "complement có trọng âm rơi vào âm tiết thứ 1, các từ còn lại rơi vào âm tiết thứ 2." },
+            { id: 20, type: "stress", words: ["custom", "explain", "chopstick", "manner"], correct: 1,
+              ipa: ["/ˈkʌstəm/", "/ɪkˈspleɪn/", "/ˈtʃɒpstɪk/", "/ˈmænər/"], vi: ["phong tục (1)", "giải thích (2)", "đũa (1)", "cách thức (1)"],
+              why: "explain có trọng âm rơi vào âm tiết thứ 2, các từ còn lại rơi vào âm tiết thứ 1." }
+        ];
+
+        let score = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const app = document.getElementById('quiz-app');
+
+        questions.forEach((q, index) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            
+            const header = document.createElement('div');
+            header.className = 'question-header';
+            
+            const listText = q.words.map(w => {
+                if(q.type === 'pron') return w.replace(q.underline, `<u>${q.underline}</u>`);
+                return w;
+            }).join(' | ');
+
+            header.innerHTML = `
+                <span class="question-num">🌟 CÂU ${index + 1}:</span>
+                <div class="word-list">${listText}</div>
+            `;
+            
+            const grid = document.createElement('div');
+            grid.className = 'answer-grid';
+            
+            let options = q.words.map((w, i) => ({ text: w, originalIdx: i }));
+            shuffle(options);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-answer';
+                if(q.type === 'pron') {
+                    btn.innerHTML = opt.text.replace(q.underline, `<u>${q.underline}</u>`);
+                } else {
+                    btn.innerText = opt.text;
+                }
+                
+                btn.onclick = () => {
+                    const allBtns = grid.querySelectorAll('.btn-answer');
+                    allBtns.forEach(b => b.classList.add('locked'));
+                    
+                    const expBox = card.querySelector('.explanation');
+                    expBox.style.display = 'block';
+
+                    if(opt.originalIdx === q.correct) {
+                        btn.classList.add('correct');
+                        playSound(523.25, 'sine', 0.3); // C5
+                        setTimeout(() => playSound(659.25, 'sine', 0.3), 100); // E5
+                        score++;
+                    } else {
+                        btn.classList.add('wrong');
+                        playSound(150, 'sawtooth', 0.4);
+                        allBtns.forEach(b => {
+                            // Find the correct button by text
+                            let cleanText = b.innerText.trim();
+                            if(cleanText === q.words[q.correct]) b.classList.add('correct');
+                        });
+                    }
+                };
+                grid.appendChild(btn);
+            });
+
+            const exp = document.createElement('div');
+            exp.className = 'explanation';
+            const banner = q.type === 'pron' ? "Chọn từ có phần gạch chân phát âm khác với các từ còn lại." : "Chọn từ có trọng âm khác với các từ còn lại.";
+            
+            let analysisHtml = q.words.map((w, i) => `
+                <div class="exp-item">• <span class="exp-eng">${w}</span> <span class="exp-ipa">[ ${q.ipa[i]} ]</span>: <span class="exp-vi">${q.vi[i]}</span></div>
+            `).join('');
+
+            exp.innerHTML = `
+                <div class="exp-banner">${banner}</div>
+                <div class="exp-content">
+                    <div class="analysis-title">1. Phân tích 4 đáp án:</div>
+                    ${analysisHtml}
+                    <div class="analysis-title" style="margin-top: 15px;">2. Tại sao chọn ${q.words[q.correct]}?</div>
+                    <p style="margin: 0; color: #444;">${q.why}</p>
+                </div>
+            `;
+
+            card.appendChild(header);
+            card.appendChild(grid);
+            card.appendChild(exp);
+            app.appendChild(card);
+        });
+
+        function showTotal() {
+            const modal = document.getElementById('modal');
+            const scoreDisp = document.getElementById('final-score');
+            const praise = document.getElementById('praise-text');
+            
+            scoreDisp.innerText = `${score}/20`;
+            if(score === 20) praise.innerText = "Tuyệt vời! Con đúng là thiên tài tiếng Anh! 💎";
+            else if(score >= 15) praise.innerText = "Làm tốt lắm! Con học bài rất kỹ rồi đó! 🌟";
+            else praise.innerText = "Con cần cố gắng hơn chút nữa nhé. Hãy đọc kỹ giải thích của cô! ❤️";
+            
+            modal.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
